@@ -7,6 +7,7 @@ package com.anwesh.uiprojects.linkedwview
 import android.app.Activity
 import android.view.View
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.view.MotionEvent
 import android.graphics.*
 
@@ -200,6 +201,7 @@ class LinkedWView(ctx : Context) : View(ctx) {
     companion object {
         fun create(activity : Activity)  : LinkedWView {
             val view : LinkedWView = LinkedWView(activity)
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             activity.setContentView(view)
             return view
         }
