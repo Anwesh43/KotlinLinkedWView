@@ -142,4 +142,31 @@ class LinkedWView(ctx : Context) : View(ctx) {
             return this
         }
     }
+
+    data class LinkedW(var i : Int) {
+
+        private var curr : LWNode = LWNode(0)
+
+        private var dir : Int = 1
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            paint.color = Color.parseColor("#9b59b6")
+            paint.strokeWidth = Math.min(canvas.width, canvas.height).toFloat() / 60
+            paint.strokeCap = Paint.Cap.ROUND
+            curr.draw(canvas, paint)
+        }
+
+        fun update(stopcb : (Float) -> Unit) {
+            curr.update {
+                curr = curr.getNext(dir) {
+                    dir *= -1
+                }
+                stopcb(it)
+            }
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            curr.startUpdating(startcb)
+        }
+    }
 }
