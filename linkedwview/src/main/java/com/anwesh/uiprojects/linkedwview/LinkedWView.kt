@@ -19,6 +19,12 @@ class LinkedWView(ctx : Context) : View(ctx) {
 
     private val renderer : Renderer = Renderer(this)
 
+    private var listener : LinkedWListener? = null
+
+    fun addLinkedWListener(onCompleteListener : (Int) -> Unit, onReset: (Int) -> Unit) {
+        listener = LinkedWListener(onCompleteListener, onReset)
+    }
+
     override fun onDraw(canvas : Canvas) {
         renderer.render(canvas, paint)
     }
@@ -94,8 +100,10 @@ class LinkedWView(ctx : Context) : View(ctx) {
 
         private var prev : LWNode? = null
 
-        fun update(stopcb : (Float) -> Unit) {
-            state.update(stopcb)
+        fun update(stopcb : (Int,Float) -> Unit) {
+            state.update {
+                stopcb(i, it)
+            }
         }
 
         fun startUpdating(startcb : () -> Unit) {
@@ -161,12 +169,12 @@ class LinkedWView(ctx : Context) : View(ctx) {
             curr.draw(canvas, paint)
         }
 
-        fun update(stopcb : (Float) -> Unit) {
-            curr.update {
+        fun update(stopcb : (Int, Float) -> Unit) {
+            curr.update {j, scale ->
                 curr = curr.getNext(dir) {
                     dir *= -1
                 }
-                stopcb(it)
+                stopcb(j, scale)
             }
         }
 
@@ -185,8 +193,12 @@ class LinkedWView(ctx : Context) : View(ctx) {
             canvas.drawColor(Color.parseColor("#212121"))
             lw.draw(canvas, paint)
             animator.animate {
-                lw.update {
+                lw.update {j, scale ->
                     animator.stop()
+                    when(scale) {
+                        0f -> view.listener?.onReset?.invoke(j)
+                        1f -> view.listener?.onComplete?.invoke(j)
+                    }
                 }
             }
         }
@@ -206,4 +218,6 @@ class LinkedWView(ctx : Context) : View(ctx) {
             return view
         }
     }
+
+    data class LinkedWListener(var onComplete : (Int) -> Unit, var onReset : (Int) -> Unit)
 }
