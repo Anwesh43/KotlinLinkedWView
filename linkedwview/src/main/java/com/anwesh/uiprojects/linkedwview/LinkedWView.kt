@@ -170,4 +170,27 @@ class LinkedWView(ctx : Context) : View(ctx) {
             curr.startUpdating(startcb)
         }
     }
+
+    data class Renderer(var view : LinkedWView) {
+
+        private val animator : Animator = Animator(view)
+
+        private val lw : LinkedW = LinkedW(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            lw.draw(canvas, paint)
+            animator.animate {
+                lw.update {
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            lw.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
