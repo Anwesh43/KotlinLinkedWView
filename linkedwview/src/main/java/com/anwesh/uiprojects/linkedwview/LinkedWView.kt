@@ -4,6 +4,7 @@ package com.anwesh.uiprojects.linkedwview
  * Created by anweshmishra on 16/06/18.
  */
 
+import android.app.Activity
 import android.view.View
 import android.content.Context
 import android.view.MotionEvent
@@ -193,6 +194,14 @@ class LinkedWView(ctx : Context) : View(ctx) {
             lw.startUpdating {
                 animator.start()
             }
+        }
+    }
+
+    companion object {
+        fun create(activity : Activity)  : LinkedWView {
+            val view : LinkedWView = LinkedWView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
