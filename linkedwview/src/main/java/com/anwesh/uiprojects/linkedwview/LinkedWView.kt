@@ -9,6 +9,8 @@ import android.content.Context
 import android.view.MotionEvent
 import android.graphics.*
 
+val LW_NODES : Int = 5
+
 class LinkedWView(ctx : Context) : View(ctx) {
 
     private val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -77,6 +79,67 @@ class LinkedWView(ctx : Context) : View(ctx) {
             if (animated) {
                 animated = false
             }
+        }
+    }
+
+    data class LWNode(var i : Int) {
+
+        private val state : State = State()
+
+        private var next : LWNode? = null
+
+        private var prev : LWNode? = null
+
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            val w : Float = canvas.width.toFloat()
+            val h : Float = canvas.height.toFloat()
+            val gap : Float = w / LW_NODES
+            canvas.save()
+            canvas.translate(gap * i + gap / 2, h / 2)
+            for (i in 0..1) {
+                canvas.save()
+                canvas.translate(gap/4 * (2 * i - 1), 0f)
+                for (j in 0..1) {
+                    val index : Int = j + 2 * i
+                    canvas.save()
+                    canvas.rotate(30f * (2 * j - 1))
+                    canvas.drawLine(0f, -gap/2 * (1 - j), 0f, -gap/2 * (1 - j) + (1 - 2 * j) * (gap/2) * state.scales[index], paint)
+                    canvas.restore()
+                }
+                canvas.restore()
+            }
+            canvas.restore()
+        }
+
+        init {
+            addNeighbor()
+        }
+
+        fun addNeighbor() {
+            if (i < LW_NODES - 1) {
+                next = LWNode(i + 1)
+                next?.prev = this
+            }
+        }
+
+        fun getNext(dir : Int, cb : () -> Unit) : LWNode {
+            var curr : LWNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this
         }
     }
 }
