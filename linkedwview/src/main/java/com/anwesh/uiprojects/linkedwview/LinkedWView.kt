@@ -102,6 +102,7 @@ class LinkedWView(ctx : Context) : View(ctx) {
             val w : Float = canvas.width.toFloat()
             val h : Float = canvas.height.toFloat()
             val gap : Float = w / LW_NODES
+            prev?.draw(canvas, paint)
             canvas.save()
             canvas.translate(gap * i + gap / 2, h / 2)
             for (i in 0..1) {
